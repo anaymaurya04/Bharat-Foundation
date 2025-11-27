@@ -6,6 +6,7 @@ const Donation = () => {
     const { t } = useLanguage();
     const [formData, setFormData] = useState({ name: '', amount: '', email: '' });
     const [status, setStatus] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('upi');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -80,14 +81,43 @@ const Donation = () => {
                     </form>
                 </div>
 
-                <div className="upi-qr-section">
-                    <h3>Scan to Donate via UPI</h3>
-                    <div className="qr-placeholder">
-                        <p>UPI QR Code</p>
-                        {/* Replace with actual QR image */}
-                        <div className="qr-box"></div>
+                <div className="payment-method-section">
+                    <div className="method-toggle">
+                        <button
+                            className={`toggle-btn ${paymentMethod === 'upi' ? 'active' : ''}`}
+                            onClick={() => setPaymentMethod('upi')}
+                        >
+                            UPI
+                        </button>
+                        <button
+                            className={`toggle-btn ${paymentMethod === 'bank' ? 'active' : ''}`}
+                            onClick={() => setPaymentMethod('bank')}
+                        >
+                            Bank Transfer
+                        </button>
                     </div>
-                    <p className="upi-id">UPI ID: bharatfoundation@upi</p>
+
+                    {paymentMethod === 'upi' ? (
+                        <div className="upi-qr-section">
+                            <h3>Scan to Donate via UPI</h3>
+                            <div className="qr-placeholder">
+                                <p>UPI QR Code</p>
+                                {/* Replace with actual QR image */}
+                                <div className="qr-box"></div>
+                            </div>
+                            <p className="upi-id">UPI ID: bharatfoundation@upi</p>
+                        </div>
+                    ) : (
+                        <div className="bank-details-section">
+                            <h3>Bank Transfer Details</h3>
+                            <div className="bank-info">
+                                <p><strong>Bank Name:</strong> Punjab National Bank</p>
+                                <p><strong>Account Name:</strong> Bharat Foundation</p>
+                                <p><strong>Account No:</strong> 3913002100009042</p>
+                                <p><strong>IFSC Code:</strong> PUNB0391300</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

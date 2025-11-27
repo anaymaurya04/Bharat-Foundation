@@ -35,8 +35,12 @@ const transporter = nodemailer.createTransport({
     secure: false, // use false for STARTTLS
     auth: {
         user: 'bharatfoundation4@gmail.com',
-        pass: 'mxke ntoz yjgb lqmm'
-    }
+        pass: process.env.EMAIL_PASS || 'mxke ntoz yjgb lqmm'
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    family: 4 // Force IPv4 to prevent Render timeouts
 });
 
 // Helper to send email

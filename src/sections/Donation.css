@@ -83,9 +83,40 @@
     background-color: #b00000;
 }
 
-.upi-qr-section {
+/* Payment Method Section */
+.payment-method-section {
     flex: 1;
     min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.method-toggle {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.toggle-btn {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--primary-blue);
+    background: transparent;
+    color: var(--primary-blue);
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn.active {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.upi-qr-section,
+.bank-details-section {
     background-color: white;
     padding: 2rem;
     border-radius: 12px;
@@ -94,9 +125,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    height: 100%;
 }
 
-.upi-qr-section h3 {
+.upi-qr-section h3,
+.bank-details-section h3 {
     color: var(--primary-blue);
     margin-bottom: 1.5rem;
 }
@@ -117,7 +150,6 @@
     width: 150px;
     height: 150px;
     background-color: #ddd;
-    /* Placeholder for actual QR */
     border: 1px solid #ccc;
 }
 
@@ -125,6 +157,20 @@
     font-weight: 700;
     color: var(--primary-blue);
     font-size: 1.1rem;
+}
+
+.bank-info {
+    text-align: left;
+    width: 100%;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.bank-info p {
+    margin-bottom: 0.8rem;
+    font-size: 1.05rem;
+    color: #333;
 }
 
 .status-msg {
