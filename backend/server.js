@@ -29,35 +29,55 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Nodemailer Transporter
+// Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // use false for STARTTLS
+    service: 'gmail', // Simplest config for Gmail
     auth: {
         user: 'bharatfoundation4@gmail.com',
         pass: process.env.EMAIL_PASS || 'mxke ntoz yjgb lqmm'
     },
-    tls: {
-        rejectUnauthorized: false
-    },
-    family: 4 // Force IPv4 to prevent Render timeouts
+    family: 4, // Force IPv4
+    logger: true, // Log to console
+    debug: true   // Include SMTP traffic in logs
 });
 
-// Helper to send email
+// Verify connection on startup
+transporter.verify(function (error, success) {
+    if (error) {
+        console.log('[SMTP ERROR] Connection failed:', error);
+    } else {
+        console.log('[SMTP SUCCESS] Server is ready to take our messages');
+    }
+});
+
+// Helper to send email with timeout
 const sendEmail = async (to, subject, text) => {
     try {
         console.log(`[EMAIL ATTEMPT] To: ${to}, Subject: ${subject}`);
-        await transporter.sendMail({
+
+        // Create a timeout promise (e.g., 10 seconds)
+        const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Email sending timed out')), 10000)
+        );
+
+        const mailOptions = {
             from: '"Bharat Foundation" <bharatfoundation4@gmail.com>',
             to,
             subject,
             text
-        });
+        };
+
+        // Race between sending mail and timeout
+        await Promise.race([
+            transporter.sendMail(mailOptions),
+            timeout
+        ]);
+
         console.log(`[EMAIL SENT] To: ${to}`);
         return true;
     } catch (error) {
-        console.error('Email error:', error);
-        return false;
+        console.error('[EMAIL FAILED]:', error);
+        return false; // Don't crash the server, just return false
     }
 };
 
