@@ -25,6 +25,4 @@ dist-ssr
 
 # Backend
 backend/foundation.db
-backend/uploads/*
-!backend/uploads/.gitkeep
 backend/node_modules

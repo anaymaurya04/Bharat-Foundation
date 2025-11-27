@@ -35,16 +35,16 @@ const db = new sqlite3.Database(dbPath, (err) => {
         if (row.count === 0) {
           console.log("Seeding Members...");
           const members = [
-            { name: "Chandra Mohan Saxena", role: "Founder Member", image: "http://localhost:5000/uploads/founder1.jpeg", type: "founder", color: "#fca311" },
-            { name: "Dhananjay Pandey", role: "Secretary", image: "http://localhost:5000/uploads/founder2.jpeg", type: "founder", color: "#0f2b44" },
-            { name: "Rajesh Singh", role: "Founder Member", image: "http://localhost:5000/uploads/founder3.jpeg", type: "founder", color: "#fca311" },
-            { name: "Rekha Pandey", role: "Adyaksh", image: "http://localhost:5000/uploads/founder4.jpeg", type: "founder", color: "#d00000" },
-            { name: "Ankit Mishra", role: "Member", image: "http://localhost:5000/uploads/member1.jpeg", type: "member" },
-            { name: "Nitu Verma", role: "Member", image: "http://localhost:5000/uploads/member2.jpeg", type: "member" },
-            { name: "Sunil Mishra", role: "Member", image: "http://localhost:5000/uploads/member6.jpeg", type: "member" },
-            { name: "Member Name", role: "Member", image: "http://localhost:5000/uploads/member3.jpeg", type: "member" },
-            { name: "Member Name", role: "Member", image: "http://localhost:5000/uploads/member4.jpeg", type: "member" },
-            { name: "Member Name", role: "Member", image: "http://localhost:5000/uploads/member5.jpeg", type: "member" }
+            { name: "Rekha Pandey", role: "Adyaksh", image: "/uploads/founder4.jpeg", type: "founder", color: "#d00000" },
+            { name: "Dhananjay Pandey", role: "Secretary", image: "/uploads/founder2.jpeg", type: "founder", color: "#0f2b44" },
+            { name: "Chandra Mohan Saxena", role: "Founder Member", image: "/uploads/founder1.jpeg", type: "founder", color: "#fca311" },
+            { name: "Rajesh Singh", role: "Founder Member", image: "/uploads/founder3.jpeg", type: "founder", color: "#fca311" },
+            { name: "Ankit Mishra", role: "Member", image: "/uploads/member1.jpeg", type: "member" },
+            { name: "Nitu Verma", role: "Member", image: "/uploads/member2.jpeg", type: "member" },
+            { name: "Sunil Mishra", role: "Member", image: "/uploads/member6.jpeg", type: "member" },
+            { name: "Member Name", role: "Member", image: "/uploads/member3.jpeg", type: "member" },
+            { name: "Member Name", role: "Member", image: "/uploads/member4.jpeg", type: "member" },
+            { name: "Member Name", role: "Member", image: "/uploads/member5.jpeg", type: "member" }
           ];
           const stmt = db.prepare("INSERT INTO members (name, role, image, type, color) VALUES (?, ?, ?, ?, ?)");
           members.forEach(m => stmt.run(m.name, m.role, m.image, m.type, m.color));
@@ -65,8 +65,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
         if (row.count === 0) {
           console.log("Seeding Projects...");
           const projects = [
-            { title: "Gaushala Seva", description: "Providing shelter and care for cows.", image: "http://localhost:5000/uploads/gaushala.jpg" },
-            { title: "Shiv Mandir Construction", description: "Building a spiritual center for the community.", image: "http://localhost:5000/uploads/shivmandir.avif" }
+            { title: "Gaushala Seva", description: "Providing shelter and care for cows.", image: "/uploads/gaushala.jpg" },
+            { title: "Shiv Mandir Construction", description: "Building a spiritual center for the community.", image: "/uploads/shivmandir.avif" }
           ];
           const stmt = db.prepare("INSERT INTO projects (title, description, image) VALUES (?, ?, ?)");
           projects.forEach(p => stmt.run(p.title, p.description, p.image));
