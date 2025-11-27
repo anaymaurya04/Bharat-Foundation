@@ -2,7 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer'); // Removed
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -30,54 +30,46 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Nodemailer Transporter
-// Nodemailer Transporter
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'bharatfoundation4@gmail.com',
-        pass: process.env.EMAIL_PASS
-    },
-    logger: true, // Log to console
-    debug: true   // Include SMTP traffic in logs
-});
+const { Resend } = require('resend');
 
-// Verify connection on startup
-transporter.verify(function (error, success) {
-    if (error) {
-        console.log('[SMTP ERROR] Connection failed:', error);
-    } else {
-        console.log('[SMTP SUCCESS] Server is ready to take our messages');
-    }
-});
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Helper to send email with timeout
-const sendEmail = async (to, subject, text) => {
+if (!process.env.RESEND_API_KEY) {
+    console.warn('[WARNING] RESEND_API_KEY is missing. Emails will not be sent.');
+}
+
+// Helper to send email using Resend
+// Helper to send email using Resend
+const sendEmail = async (to, subject, textContent) => {
     try {
+        if (!process.env.RESEND_API_KEY) {
+            console.error('[EMAIL FAILED] No API Key');
+            return { success: false, error: { message: 'No API Key' } };
+        }
+
         console.log(`[EMAIL ATTEMPT] To: ${to}, Subject: ${subject}`);
 
-        // 60 second timeout (increased)
-        const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Email sending timed out')), 60000)
-        );
+        // Convert plain text newlines to HTML breaks for "exactly the same" formatting
+        const htmlContent = `<p>${textContent.replace(/\n/g, '<br>')}</p>`;
 
-        const mailOptions = {
-            from: '"Bharat Foundation" <bharatfoundation4@gmail.com>',
-            to,
-            subject,
-            text
-        };
+        const { data, error } = await resend.emails.send({
+            from: 'Bharat Foundation <onboarding@resend.dev>',
+            to: [to],
+            subject: subject,
+            html: htmlContent
+        });
 
-        // Race between sending mail and timeout
-        await Promise.race([
-            transporter.sendMail(mailOptions),
-            timeout
-        ]);
+        if (error) {
+            console.error('[EMAIL FAILED] Resend Error:', error);
+            return { success: false, error };
+        }
 
-        console.log(`[EMAIL SENT] To: ${to}`);
-        return true;
+        console.log(`[EMAIL SENT] ID: ${data.id} To: ${to}`);
+        return { success: true };
     } catch (error) {
-        console.error('[EMAIL FAILED]:', error);
-        return false; // Don't crash the server, just return false
+        console.error('[EMAIL FAILED] Unexpected Error:', error);
+        return { success: false, error };
     }
 };
 
@@ -106,12 +98,17 @@ app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
     const emailBody = `New Contact Message\n\nName: ${name}\nEmail: ${email}\nMessage: ${message}`;
 
-    const sent = await sendEmail('bharatfoundation4@gmail.com', `Contact from ${name}`, emailBody);
+    const { success, error } = await sendEmail('bharatfoundation4@gmail.com', `Contact from ${name}`, emailBody);
 
-    if (sent) {
+    if (success) {
         res.json({ success: true, message: 'Message sent successfully!' });
     } else {
-        res.status(500).json({ success: false, message: 'Failed to send email. Please try again later.' });
+        const isLimit = error?.message?.toLowerCase().includes('limit') || error?.statusCode === 429;
+        if (isLimit) {
+            res.status(429).json({ success: false, message: 'Message failed: Daily email limit exhausted. Please try again tomorrow.' });
+        } else {
+            res.status(500).json({ success: false, message: 'Failed to send email. Please try again later.' });
+        }
     }
 });
 
@@ -133,16 +130,18 @@ app.post('/api/donate', (req, res) => {
         const adminEmailBody = `New Donation Initiated\n\nDonor Name: ${name}\nAmount: ₹${amount}\nDonor Email: ${email}\nType: ${type}\n\nVerification Link: ${verificationLink}`;
 
         // Try to send emails, but don't fail the donation if email fails (just log it)
-        // Or we can warn the user. For now, let's try our best.
-        const sentDonor = await sendEmail(email, 'Verify your Donation - Bharat Foundation', donorEmailBody);
+        const donorEmailResult = await sendEmail(email, 'Verify your Donation - Bharat Foundation', donorEmailBody);
         await sendEmail('bharatfoundation4@gmail.com', 'New Donation Alert', adminEmailBody);
 
-        if (sentDonor) {
+        if (donorEmailResult.success) {
             res.json({ success: true, message: 'Donation initiated. Check your email.', id: donorId });
         } else {
-            // Return success but with a warning, or handle as error?
-            // User needs email to verify. So this is critical.
-            res.json({ success: true, message: 'Donation recorded, but email failed. Please contact admin.', id: donorId, emailFailed: true });
+            const isLimit = donorEmailResult.error?.message?.toLowerCase().includes('limit') || donorEmailResult.error?.statusCode === 429;
+            const msg = isLimit
+                ? 'Donations down: Daily email limit exhausted. Please try again tomorrow.'
+                : 'Donation recorded, but email failed. Please contact admin.';
+
+            res.json({ success: true, message: msg, id: donorId, emailFailed: true });
         }
     });
 });
