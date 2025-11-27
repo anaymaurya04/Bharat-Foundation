@@ -54,7 +54,7 @@ const sendEmail = async (to, subject, textContent) => {
         const htmlContent = `<p>${textContent.replace(/\n/g, '<br>')}</p>`;
 
         const { data, error } = await resend.emails.send({
-            from: 'Bharat Foundation <onboarding@resend.dev>',
+            from: 'Bharat Foundation <support@bharatfoundationprayagraj.com>',
             to: [to],
             subject: subject,
             html: htmlContent
