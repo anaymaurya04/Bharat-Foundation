@@ -158,6 +158,62 @@ app.post('/api/verify', (req, res) => {
     });
 });
 
+// --- EMAIL VERIFICATION ROUTE (GET) ---
+app.get('/verify/:id', (req, res) => {
+    const id = req.params.id;
+    const sql = 'UPDATE donors SET verified = 1 WHERE id = ?';
+
+    db.run(sql, id, function (err) {
+        if (err) {
+            console.error('Verification Error:', err);
+            return res.status(500).send(`
+                <html>
+                    <head><title>Verification Failed</title></head>
+                    <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+                        <h1 style="color: red;">Verification Failed</h1>
+                        <p>Something went wrong. Please try again later or contact support.</p>
+                    </body>
+                </html>
+            `);
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).send(`
+                <html>
+                    <head><title>Invalid Link</title></head>
+                    <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+                        <h1 style="color: orange;">Invalid Link</h1>
+                        <p>This donation record could not be found.</p>
+                    </body>
+                </html>
+            `);
+        }
+
+        res.send(`
+            <html>
+                <head>
+                    <title>Donation Verified</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f9f9f9; }
+                        .container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+                        h1 { color: #2e7d32; margin-bottom: 20px; }
+                        p { color: #555; font-size: 18px; line-height: 1.6; }
+                        .btn { display: inline-block; margin-top: 20px; padding: 12px 25px; background-color: #d32f2f; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                        .btn:hover { background-color: #b71c1c; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>✅ Donation Verified!</h1>
+                        <p>Thank you for your generosity. Your donation has been successfully verified and will now appear on our Wall of Gratitude.</p>
+                        <a href="/" class="btn">Return to Website</a>
+                    </div>
+                </body>
+            </html>
+        `);
+    });
+});
+
 app.get('/api/donors', (req, res) => {
     const sql = 'SELECT * FROM donors WHERE verified = 1 ORDER BY id DESC';
     db.all(sql, [], (err, rows) => {
