@@ -31,7 +31,9 @@ const upload = multer({ storage: storage });
 // Nodemailer Transporter
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // Simplest config for Gmail
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL
     auth: {
         user: 'bharatfoundation4@gmail.com',
         pass: process.env.EMAIL_PASS || 'mxke ntoz yjgb lqmm'
@@ -55,9 +57,9 @@ const sendEmail = async (to, subject, text) => {
     try {
         console.log(`[EMAIL ATTEMPT] To: ${to}, Subject: ${subject}`);
 
-        // Create a timeout promise (e.g., 10 seconds)
+        // 15 second timeout
         const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Email sending timed out')), 10000)
+            setTimeout(() => reject(new Error('Email sending timed out')), 15000)
         );
 
         const mailOptions = {
@@ -105,8 +107,14 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
     const emailBody = `New Contact Message\n\nName: ${name}\nEmail: ${email}\nMessage: ${message}`;
-    await sendEmail('bharatfoundation4@gmail.com', `Contact from ${name}`, emailBody);
-    res.json({ success: true, message: 'Message sent successfully!' });
+
+    const sent = await sendEmail('bharatfoundation4@gmail.com', `Contact from ${name}`, emailBody);
+
+    if (sent) {
+        res.json({ success: true, message: 'Message sent successfully!' });
+    } else {
+        res.status(500).json({ success: false, message: 'Failed to send email. Please try again later.' });
+    }
 });
 
 // --- DONATION APIs ---
@@ -121,15 +129,23 @@ app.post('/api/donate', (req, res) => {
             return;
         }
         const donorId = this.lastID;
-        const verificationLink = `http://localhost:5173/verify/${donorId}`;
+        const verificationLink = `https://bharat-foundation.onrender.com/verify/${donorId}`; // Updated to Prod URL
 
         const donorEmailBody = `Thank you for your donation of ₹${amount}!\n\nPlease click the link below to verify your donation and appear on our Wall of Gratitude:\n${verificationLink}`;
-        await sendEmail(email, 'Verify your Donation - Bharat Foundation', donorEmailBody);
-
         const adminEmailBody = `New Donation Initiated\n\nDonor Name: ${name}\nAmount: ₹${amount}\nDonor Email: ${email}\nType: ${type}\n\nVerification Link: ${verificationLink}`;
+
+        // Try to send emails, but don't fail the donation if email fails (just log it)
+        // Or we can warn the user. For now, let's try our best.
+        const sentDonor = await sendEmail(email, 'Verify your Donation - Bharat Foundation', donorEmailBody);
         await sendEmail('bharatfoundation4@gmail.com', 'New Donation Alert', adminEmailBody);
 
-        res.json({ success: true, message: 'Donation initiated.', id: donorId });
+        if (sentDonor) {
+            res.json({ success: true, message: 'Donation initiated. Check your email.', id: donorId });
+        } else {
+            // Return success but with a warning, or handle as error?
+            // User needs email to verify. So this is critical.
+            res.json({ success: true, message: 'Donation recorded, but email failed. Please contact admin.', id: donorId, emailFailed: true });
+        }
     });
 });
 
