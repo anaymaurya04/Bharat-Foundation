@@ -4,21 +4,22 @@ import { LanguageProvider } from './context/LanguageContext';
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { Suspense, lazy } from 'react';
+import Hero from './sections/Hero';
+import History from './sections/History';
+import WallOfGratitude from './sections/WallOfGratitude';
+import Moments from './sections/Moments';
+import Projects from './sections/Projects';
+import Team from './sections/Team';
+import Donation from './sections/Donation';
+import Contact from './sections/Contact';
+import VerifyDonation from './pages/VerifyDonation';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
-const Hero = lazy(() => import('./sections/Hero'));
-const History = lazy(() => import('./sections/History'));
-const WallOfGratitude = lazy(() => import('./sections/WallOfGratitude'));
-const Moments = lazy(() => import('./sections/Moments'));
-const Projects = lazy(() => import('./sections/Projects'));
-const Team = lazy(() => import('./sections/Team'));
-const Donation = lazy(() => import('./sections/Donation'));
-const Contact = lazy(() => import('./sections/Contact'));
-
-const LoadingFallback = () => <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+import SEO from './components/SEO';
 
 const Home = () => (
-  <Suspense fallback={<LoadingFallback />}>
+  <>
     <SEO
       title="Bharat Foundation Prayagraj | Empowering Lives & Education"
       description="Bharat Foundation in Prayagraj is a leading NGO dedicated to education, healthcare, and social welfare. Join us in making a difference today."
@@ -86,7 +87,7 @@ const Home = () => (
     <WallOfGratitude />
     <Moments />
     <Contact />
-  </Suspense>
+  </>
 );
 
 const DonationPage = () => (
