@@ -20,20 +20,14 @@ const Moments = () => {
     }, []);
 
     return (
-        <section id="gallery" className="moments">
+        <section id="gallery" className="moments" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
             <h2 className="moments-title">{t.moments.title}</h2>
-            <div className="moments-grid">
-                {moments.map((moment, index) => (
-                    <div
-                        key={index}
-                        className="moment-card"
-                        style={{ backgroundColor: moment.color }}
-                    >
-                        {moment.image && <img src={moment.image} alt={`${moment.title} - Bharat Foundation Event`} loading="lazy" style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px', marginBottom: '1rem' }} />}
-                        <h3>{moment.title}</h3>
-                    </div>
-                ))}
-            </div>
+            <p style={{ marginBottom: '2rem', fontSize: '1.2rem', color: '#555' }}>
+                Explore our journey and the impact we've created together.
+            </p>
+            <a href="/gallery" className="donate-btn" style={{ display: 'inline-block', textDecoration: 'none' }}>
+                View Full Gallery
+            </a>
         </section>
     );
 };

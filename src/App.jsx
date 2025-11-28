@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './sections/Hero';
 import History from './sections/History';
-import WallOfGratitude from './sections/WallOfGratitude';
+
 import Moments from './sections/Moments';
 import Projects from './sections/Projects';
 import Team from './sections/Team';
@@ -15,6 +15,8 @@ import Contact from './sections/Contact';
 import VerifyDonation from './pages/VerifyDonation';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import Gallery from './pages/Gallery';
+import ProjectDetails from './pages/ProjectDetails';
 
 import SEO from './components/SEO';
 
@@ -84,7 +86,7 @@ const Home = () => (
     <History />
     <Team />
     <Projects />
-    <WallOfGratitude />
+
     <Moments />
     <Contact />
   </>
@@ -118,6 +120,26 @@ const AdminDashboardPage = () => (
   </>
 );
 
+const GalleryPage = () => (
+  <>
+    <SEO
+      title="Gallery | Bharat Foundation Prayagraj"
+      description="Explore our moments of impact and the journey of Bharat Foundation."
+    />
+    <Gallery />
+  </>
+);
+
+const ProjectDetailsPage = () => (
+  <>
+    <SEO
+      title="Project Details | Bharat Foundation Prayagraj"
+      description="Learn more about our projects and how you can contribute."
+    />
+    <ProjectDetails />
+  </>
+);
+
 const VerifyDonationPage = () => (
   <>
     <SEO title="Verify Donation" noindex={true} />
@@ -137,6 +159,8 @@ function App() {
             <Route path="/verify/:id" element={<VerifyDonationPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailsPage />} />
           </Routes>
           <Footer />
         </div>

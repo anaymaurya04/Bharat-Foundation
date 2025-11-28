@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 const ManageMoments = () => {
     const [moments, setMoments] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({ title: '', color: '#fca311' });
+    const [formData, setFormData] = useState({ title: 'Moment', color: '#fca311' });
     const [imageFile, setImageFile] = useState(null);
     const [editId, setEditId] = useState(null);
 
@@ -47,7 +47,7 @@ const ManageMoments = () => {
             body: JSON.stringify(payload)
         });
 
-        setFormData({ title: '', color: '#fca311' });
+        setFormData({ title: 'Moment', color: '#fca311' });
         setImageFile(null);
         setIsEditing(false);
         setEditId(null);
@@ -75,13 +75,11 @@ const ManageMoments = () => {
 
             <form onSubmit={handleSubmit} style={{ marginBottom: '2rem', padding: '1rem', background: '#eee', borderRadius: '8px' }}>
                 <h3>{isEditing ? 'Edit Moment' : 'Add New Moment'}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <input placeholder="Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} required className="form-input" />
-                    <input type="color" value={formData.color} onChange={e => setFormData({ ...formData, color: e.target.value })} className="form-input" style={{ height: '40px' }} />
-                    <input type="file" onChange={e => setImageFile(e.target.files[0])} className="form-input" style={{ gridColumn: 'span 2' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                    <input type="file" onChange={e => setImageFile(e.target.files[0])} className="form-input" required={!isEditing} />
                 </div>
                 <button type="submit" className="add-btn" style={{ marginTop: '1rem' }}>{isEditing ? 'Update' : 'Add'} Moment</button>
-                {isEditing && <button type="button" onClick={() => { setIsEditing(false); setFormData({ title: '', color: '#fca311' }); }} style={{ marginLeft: '1rem' }}>Cancel</button>}
+                {isEditing && <button type="button" onClick={() => { setIsEditing(false); setFormData({ title: 'Moment', color: '#fca311' }); }} style={{ marginLeft: '1rem' }}>Cancel</button>}
             </form>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>

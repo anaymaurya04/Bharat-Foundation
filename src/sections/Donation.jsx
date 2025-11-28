@@ -95,9 +95,15 @@ const Donation = () => {
                         >
                             Bank Transfer
                         </button>
+                        <button
+                            className={`toggle-btn ${paymentMethod === 'foreign' ? 'active' : ''}`}
+                            onClick={() => setPaymentMethod('foreign')}
+                        >
+                            Foreign Donation
+                        </button>
                     </div>
 
-                    {paymentMethod === 'upi' ? (
+                    {paymentMethod === 'upi' && (
                         <div className="upi-qr-section">
                             <h3>Scan to Donate via UPI</h3>
                             <div className="qr-placeholder">
@@ -107,7 +113,9 @@ const Donation = () => {
                             </div>
                             <p className="upi-id">UPI ID: bharatfoundation@upi</p>
                         </div>
-                    ) : (
+                    )}
+
+                    {paymentMethod === 'bank' && (
                         <div className="bank-details-section">
                             <h3>Bank Transfer Details</h3>
                             <div className="bank-info">
@@ -115,6 +123,17 @@ const Donation = () => {
                                 <p><strong>Account Name:</strong> Bharat Foundation</p>
                                 <p><strong>Account No:</strong> 3913002100009042</p>
                                 <p><strong>IFSC Code:</strong> PUNB0391300</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {paymentMethod === 'foreign' && (
+                        <div className="foreign-donation-section">
+                            <h3>Foreign Donation (FCRA)</h3>
+                            <div className="bank-info">
+                                <p>For foreign donations, please contact us directly for FCRA account details.</p>
+                                <p><strong>Email:</strong> bharatfoundation4@gmail.com</p>
+                                <p><strong>Phone:</strong> +91 9911031689</p>
                             </div>
                         </div>
                     )}

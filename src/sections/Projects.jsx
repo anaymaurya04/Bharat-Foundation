@@ -27,12 +27,12 @@ const Projects = () => {
 
             <div className="projects-grid">
                 {projects.map((project, index) => (
-                    <div key={index} className="project-card">
+                    <div key={index} className="project-card" onClick={() => navigate(`/projects/${project.id}`)} style={{ cursor: 'pointer' }}>
                         <div className="project-image" style={{ backgroundImage: `url(${project.image})` }}></div>
                         <div className="project-content">
                             <h3 className="project-name">{project.title}</h3>
                             <p className="project-desc">{project.description}</p>
-                            <button className="project-btn" onClick={() => navigate('/donate')}>Donate to the Cause</button>
+                            <button className="project-btn" onClick={(e) => { e.stopPropagation(); navigate('/donate'); }}>Donate to the Cause</button>
                         </div>
                     </div>
                 ))}

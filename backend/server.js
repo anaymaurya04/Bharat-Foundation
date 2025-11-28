@@ -1,4 +1,5 @@
 const express = require('express');
+const https = require('https');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -40,18 +41,19 @@ const upload = multer({ storage: storage });
 const { Resend } = require('resend');
 
 // Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-if (!process.env.RESEND_API_KEY) {
+// Initialize Resend
+let resend;
+if (process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+} else {
     console.warn('[WARNING] RESEND_API_KEY is missing. Emails will not be sent.');
 }
 
 // Helper to send email using Resend
-// Helper to send email using Resend
 const sendEmail = async (to, subject, textContent) => {
     try {
-        if (!process.env.RESEND_API_KEY) {
-            console.error('[EMAIL FAILED] No API Key');
+        if (!resend) {
+            console.error('[EMAIL FAILED] No API Key or Resend client not initialized');
             return { success: false, error: { message: 'No API Key' } };
         }
 
@@ -340,6 +342,21 @@ app.get('/api/projects', (req, res) => {
     });
 });
 
+app.get('/api/projects/:id', (req, res) => {
+    const sql = 'SELECT * FROM projects WHERE id = ?';
+    db.get(sql, [req.params.id], (err, row) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        if (!row) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+        res.json({ data: row });
+    });
+});
+
 app.post('/api/projects', (req, res) => {
     const { title, description, image } = req.body;
     const sql = 'INSERT INTO projects (title, description, image) VALUES (?, ?, ?)';
@@ -421,6 +438,23 @@ app.delete('/api/moments/:id', (req, res) => {
         res.json({ success: true });
     });
 });
+
+// --- SELF-PING MECHANISM (Keep Alive) ---
+app.get('/ping', (req, res) => {
+    res.status(200).send('pong');
+});
+
+// Ping the server every 14 minutes (840,000 ms) to prevent sleep
+const PING_INTERVAL = 14 * 60 * 1000;
+const SERVER_URL = 'https://bharatfoundationprayagraj.com/ping';
+
+setInterval(() => {
+    https.get(SERVER_URL, (res) => {
+        console.log(`[KEEP-ALIVE] Ping sent to ${SERVER_URL}. Status: ${res.statusCode}`);
+    }).on('error', (e) => {
+        console.error(`[KEEP-ALIVE] Ping failed: ${e.message}`);
+    });
+}, PING_INTERVAL);
 
 // --- SPA CATCH-ALL ROUTE ---
 // This must be the last route. It serves index.html for any unknown routes,

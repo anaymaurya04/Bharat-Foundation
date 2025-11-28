@@ -37,7 +37,7 @@ const Navbar = () => {
                 <button onClick={() => handleScroll('projects')} className="nav-link-btn">{t.nav.projects}</button>
                 <button onClick={() => handleScroll('gallery')} className="nav-link-btn">{t.nav.gallery}</button>
                 <button onClick={() => handleScroll('contact')} className="nav-link-btn">{t.nav.contact}</button>
-                <button onClick={() => handleScroll('donors')} className="nav-link-btn">{t.nav.donors}</button>
+
             </div>
             <div className="navbar-actions">
                 <button className="lang-toggle" onClick={toggleLanguage}>
